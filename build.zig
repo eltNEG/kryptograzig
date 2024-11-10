@@ -1,5 +1,7 @@
 const std = @import("std");
 
+const name = "kryptograzig";
+
 // Although this function looks imperative, note that its job is to
 // declaratively construct a build graph that will be executed by an external
 // runner.
@@ -16,7 +18,7 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
 
     const lib = b.addStaticLibrary(.{
-        .name = "cryptography",
+        .name = name,
         // In this case the main source file is merely a path, however, in more
         // complicated build scripts, this could be a generated file.
         .root_source_file = b.path("src/root.zig"),
@@ -29,8 +31,15 @@ pub fn build(b: *std.Build) void {
     // running `zig build`).
     b.installArtifact(lib);
 
+    // expose library as a module
+    _ = b.addModule(name, .{
+        .root_source_file = b.path("src/root.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
     const exe = b.addExecutable(.{
-        .name = "cryptography",
+        .name = name,
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
